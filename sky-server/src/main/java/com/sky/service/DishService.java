@@ -39,4 +39,10 @@ public interface DishService {
     * 根据菜品id修改
     * */
     void updateWithFlavor(DishDTO dishDTO);
+
+
+    /*
+    * 根据菜品id启售禁售
+    * */
+    void startOrStop(Integer status, Long id);
 }
