@@ -7,6 +7,7 @@ import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Dish;
+import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -76,6 +78,38 @@ public class SetmealServiceImpl implements SetmealService {
 //        批量删除
         setmealMapper.deleteByIds(ids);
         setmealDishMapper.deleteBySetmealIds(ids);
+    }
+
+    @Override
+    public SetmealVO getByIdWithDish(Long id) {
+
+        Setmeal setmeal = setmealMapper.getById(id);
+
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+//        封装
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+
+        setmealVO.setSetmealDishes(setmealDishes);
+        return setmealVO;
+    }
+
+    @Override
+    public void updateWithDish(SetmealDTO setmealDTO) {
+//        修改套餐表
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        setmealMapper.update(setmeal);
+//        修改口味表,先删再插
+        Long semealId = setmealDTO.getId();
+        setmealDishMapper.deleteBySetmealIds(new ArrayList<Long>(){{add(semealId);}});
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if(setmealDishes!=null&&setmealDishes.size()>0){
+            setmealDishes.forEach(setmealDish -> {
+                setmealDish.setSetmealId(semealId);
+            });
+            setmealDishMapper.insertBatch(setmealDishes);
+        }
     }
 
 }
