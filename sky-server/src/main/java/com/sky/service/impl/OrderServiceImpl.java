@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -225,4 +226,45 @@ public class OrderServiceImpl implements OrderService {
 
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
+
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        int pageNum = ordersPageQueryDTO.getPage();
+        int pageSize = ordersPageQueryDTO.getPageSize();
+        PageHelper.startPage(pageNum, pageSize);
+
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+
+        List<OrderVO> list = getOrderVOList(page);
+        return new PageResult(page.getTotal(), page);
+    }
+
+    private List<OrderVO> getOrderVOList(Page<Orders> page) {
+        List<OrderVO> orderVOList = new ArrayList<>();
+        List<Orders> ordersList = page.getResult();
+        if(!CollectionUtils.isEmpty(ordersList)){
+            for (Orders orders : ordersList) {
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                String orderDishes = getOrderDishesStr(orders);
+
+                orderVO.setOrderDishes(orderDishes);
+                orderVOList.add(orderVO);
+            }
+        }
+        return orderVOList;
+    }
+
+    private String getOrderDishesStr(Orders orders) {
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+
+        List<String> orderDishList = orderDetailList.stream().map(x->{
+            String orderDish = x.getName()+"*"+x.getNumber()+";";
+            return orderDish;
+        }).collect(Collectors.toList());
+
+        return String.join("", orderDishList);
+    }
+
+
 }
