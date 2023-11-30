@@ -192,4 +192,21 @@ public class OrderServiceImpl implements OrderService {
 
         return orderVO;
     }
+
+    @Override
+    public void userCancelById(Long id) throws Exception{
+        Orders orders = orderMapper.getById(id);
+        if(orders==null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        if(orders.getStatus()>2){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+//        取消订单成功，修改状态
+        orders.setStatus(Orders.CANCELLED);
+        orders.setPayStatus(Orders.REFUND);
+        orders.setCancelReason("用户退款");
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
 }
