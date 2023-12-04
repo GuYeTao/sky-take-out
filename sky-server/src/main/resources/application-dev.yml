@@ -7,19 +7,19 @@ sky:
     username: root
     password: root
   alioss:
-    endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5t7Ea8pK5ooK8Gt1czeh
-    access-key-secret: MElHIRPX8lrMAonlXpmX749bZj7xyN
-    bucket-name: sky-savepic
+    endpoint: 
+    access-key-id: 
+    access-key-secret: 
+    bucket-name: 
   redis:
     host: localhost
     port: 6379
     password: 123456
     database: 10
   wechat:
-    appid: wx748b43d8067441f5
-    secret: dd8d153a0184e1fc57ad064ca80662ac
+    appid: 
+    secret: 
   shop:
-    address: 北京市海淀区上地十街10号
+    address: 
   baidu:
-    ak: Dan6VcXiV1fwG5DVAxRFgIy8FGrHqpF2
+    ak: 
